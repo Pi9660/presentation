@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pitch Deck - ASSIGANME-LEKAME | Premium Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800;900&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712; /* Noir très profond */
+            color: #f8fafc;
+            overflow: hidden;
+            touch-action: none; /* Améliore l'expérience tactile sur mobile */
+        }
+
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 10;
+        }
+
+        /* Animation d'entrée très premium */
+        .slide-content {
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+            transition-delay: 0.2s;
+            width: 100%; /* S'assure que le contenu prend toute la largeur disponible */
+        }
+
+        .slide.active .slide-content {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(3, 7, 18, 0.95) 0%, rgba(15, 23, 42, 0.8) 100%);
+            z-index: -1;
+        }
+
+        /* Effet Glassmorphism de niveau Senior */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.15);
+        }
+
+        #progress-bar {
+            height: 5px;
+            background: linear-gradient(90deg, #3b82f6, #10b981, #8b5cf6);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .split-layout { display: flex; flex-direction: column; min-height: 100%; width: 100%; }
+        @media (min-width: 768px) { .split-layout { flex-direction: row; height: 100%; } }
+        /* Réduction du padding sur mobile pour la vue scindée */
+        .split-text { width: 100%; padding: 1.5rem 1rem 3rem 1rem; display: flex; flex-direction: column; justify-content: center; }
+        .split-image { width: 100%; min-height: 250px; position: relative; }
+        @media (min-width: 768px) { 
+            .split-text { width: 55%; padding: 6rem; }
+            .split-image { width: 45%; min-height: 100%; }
+        }
+
+        /* Glow text */
+        .text-glow {
+            text-shadow: 0 0 40px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="relative h-screen w-screen selection:bg-blue-500 selection:text-white">
+
+    <div class="fixed top-0 left-0 w-full z-50 bg-gray-900/50 backdrop-blur-sm">
+        <div id="progress-bar"></div>
+    </div>
+
+    <!-- BOUTONS DE NAVIGATION LATÉRAUX PREMIUM -->
+    <!-- Modifiés pour être plus discrets sur mobile (w-12 h-12, left-2) mais toujours larges sur PC -->
+    <button id="prevBtn" onclick="changeSlide(-1)" class="fixed left-2 md:left-8 top-1/2 -translate-y-1/2 z-50 w-12 h-12 md:w-20 md:h-20 rounded-full bg-white/5 border border-white/10 text-white/50 flex items-center justify-center hover:bg-blue-600 hover:text-white hover:border-blue-400 hover:scale-110 transition-all duration-300 backdrop-blur-xl shadow-2xl disabled:opacity-0 disabled:pointer-events-none group">
+        <i class="fa-solid fa-chevron-left text-lg md:text-3xl group-hover:-translate-x-2 transition-transform duration-300"></i>
+    </button>
+
+    <button id="nextBtn" onclick="changeSlide(1)" class="fixed right-2 md:right-8 top-1/2 -translate-y-1/2 z-50 w-12 h-12 md:w-20 md:h-20 rounded-full bg-blue-600/80 border border-blue-400/50 text-white flex items-center justify-center hover:bg-blue-500 hover:scale-110 transition-all duration-300 backdrop-blur-xl shadow-[0_0_30px_rgba(59,130,246,0.4)] group">
+        <i class="fa-solid fa-chevron-right text-lg md:text-3xl group-hover:translate-x-2 transition-transform duration-300"></i>
+    </button>
+
+    <div id="slides-container" class="relative w-full h-full">
+
+        <!-- SLIDE 1 : Couverture -->
+        <div class="slide active">
+            <div class="absolute inset-0 bg-cover bg-center z-[-2] opacity-40 mix-blend-luminosity" style="background-image: url('https://images.unsplash.com/photo-1573164574572-cb89e39749b4?auto=format&fit=crop&w=1920&q=80');"></div>
+            <div class="bg-overlay"></div>
+
+            <!-- Ajustement des marges : px-6 sur mobile au lieu de px-16 -->
+            <div class="flex-1 flex flex-col items-center justify-center text-center px-6 md:px-24 lg:px-32 slide-content py-10">
+                <div class="inline-block px-4 md:px-5 py-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs md:text-sm font-bold tracking-[0.2em] mb-6 md:mb-8 backdrop-blur-md">
+                    HACKATHON D-CLIC 2026
+                </div>
+                <h1 class="text-4xl md:text-7xl lg:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-400 mb-6 md:mb-8 pb-2 text-glow uppercase tracking-tight">
+                    ASSIGANME-LEKAME
+                </h1>
+                <p class="text-lg md:text-3xl font-light text-slate-300 max-w-4xl mx-auto mb-10 md:mb-12 leading-relaxed">
+                    Le Grand Marché en Ligne : L'interconnexion B2B & Talents qui <span class="font-semibold text-white">accélère la croissance</span> des PME Togolaises.
+                </p>
+                <div class="flex items-center justify-center gap-3 md:gap-4 text-slate-300 glass-card px-6 py-3 md:px-8 md:py-4 rounded-full w-[90%] md:w-auto mx-auto">
+                    <i class="fa-solid fa-rocket text-lg md:text-xl text-emerald-400 animate-pulse"></i>
+                    <span class="text-xs md:text-xl tracking-[0.2em] md:tracking-[0.3em] uppercase font-bold text-white">Team Jovgroup</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2 : Le Problème -->
+        <div class="slide">
+            <div class="split-layout">
+                <div class="split-text relative slide-content bg-[#030712] z-10">
+                    <div class="hidden md:block absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-red-500 to-orange-500"></div>
+
+                    <h2 class="text-red-500 font-bold tracking-[0.2em] uppercase mb-4 text-xs md:text-sm">01 // Le Problème</h2>
+                    <h3 class="text-3xl md:text-6xl font-black text-white mb-8 leading-tight">Le "Silo" détruit<br>la valeur.</h3>
+
+                    <div class="space-y-4 md:space-y-8">
+                        <div class="flex items-start gap-4 md:gap-6 p-4 md:p-6 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors duration-300">
+                            <div class="bg-red-500/10 p-3 md:p-4 rounded-xl md:rounded-2xl text-red-500 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                                <i class="fa-solid fa-link-slash text-xl md:text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg md:text-2xl font-bold mb-2 text-slate-100">Commerce B2B Fragmenté</h4>
+                                <p class="text-slate-400 text-sm md:text-lg leading-relaxed">Les PME perdent temps et argent via une recherche de partenaires inefficace.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 md:gap-6 p-4 md:p-6 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors duration-300">
+                            <div class="bg-orange-500/10 p-3 md:p-4 rounded-xl md:rounded-2xl text-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.2)]">
+                                <i class="fa-solid fa-eye-slash text-xl md:text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg md:text-2xl font-bold mb-2 text-slate-100">Talents Invisibles</h4>
+                                <p class="text-slate-400 text-sm md:text-lg leading-relaxed">Les jeunes diplômés manquent cruellement d'une vitrine pour monétiser leurs compétences.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="split-image bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1000&q=80');">
+                    <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#030712] via-[#030712]/80 to-transparent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3 : La Solution -->
+        <div class="slide">
+            <div class="absolute inset-0 bg-cover bg-center z-[-2] opacity-30 mix-blend-screen" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1920&q=80');"></div>
+            <div class="bg-overlay"></div>
+
+            <div class="h-full flex flex-col justify-center items-center px-6 md:px-24 lg:px-32 text-center slide-content py-10 w-full">
+                <h2 class="text-blue-400 font-bold tracking-[0.2em] uppercase mb-4 text-xs md:text-sm">02 // Notre Solution</h2>
+                <h3 class="text-3xl md:text-7xl font-black text-white mb-6 md:mb-8 text-glow">La Super-App Unifiée</h3>
+                <p class="text-base md:text-2xl text-slate-300 max-w-4xl mx-auto mb-8 md:mb-16 font-light">L'écosystème où l'offre, la demande et les compétences se rencontrent <span class="font-bold text-blue-400 border-b-2 border-blue-400 pb-1">instantanément.</span></p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 w-full max-w-6xl px-0 md:px-8">
+                    <div class="glass-card p-6 md:p-10 rounded-3xl flex flex-col items-center hover:-translate-y-2 md:hover:-translate-y-4 group">
+                        <div class="bg-blue-500/10 p-4 md:p-6 rounded-3xl mb-4 md:mb-8 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                            <i class="fa-solid fa-store text-3xl md:text-5xl text-blue-400"></i>
+                        </div>
+                        <h4 class="text-xl md:text-2xl font-bold mb-2 md:mb-4 text-white">Showroom B2B</h4>
+                        <p class="text-slate-400 text-center text-sm md:text-base">Recherche par catégories (Étagères).</p>
+                    </div>
+
+                    <div class="glass-card p-6 md:p-10 rounded-3xl flex flex-col items-center hover:-translate-y-2 md:hover:-translate-y-4 group border-emerald-500/30">
+                        <div class="absolute -top-3 md:-top-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] md:text-xs font-bold tracking-wider">INNOVANT</div>
+                        <div class="bg-emerald-500/10 p-4 md:p-6 rounded-3xl mb-4 md:mb-8 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                            <i class="fa-solid fa-video text-3xl md:text-5xl text-emerald-400"></i>
+                        </div>
+                        <h4 class="text-xl md:text-2xl font-bold mb-2 md:mb-4 text-white">Vidéos "Shorts"</h4>
+                        <p class="text-slate-400 text-center text-sm md:text-base">Formats < 1 min pour prouver son savoir-faire.</p>
+                    </div>
+
+                    <div class="glass-card p-6 md:p-10 rounded-3xl flex flex-col items-center hover:-translate-y-2 md:hover:-translate-y-4 group">
+                        <div class="bg-blue-500/10 p-4 md:p-6 rounded-3xl mb-4 md:mb-8 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                            <i class="fa-solid fa-handshake text-3xl md:text-5xl text-blue-400"></i>
+                        </div>
+                        <h4 class="text-xl md:text-2xl font-bold mb-2 md:mb-4 text-white">Contrats Express</h4>
+                        <p class="text-slate-400 text-center text-sm md:text-base">Messagerie sécurisée intégrée.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4 : Le Marché -->
+        <div class="slide">
+            <div class="absolute inset-0 bg-cover bg-center z-[-2] opacity-30 mix-blend-luminosity" style="background-image: url('https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1920&q=80');"></div>
+            <div class="bg-overlay"></div>
+
+            <div class="h-full flex flex-col justify-center items-center px-6 md:px-24 lg:px-32 text-center slide-content py-10">
+                <h2 class="text-emerald-400 font-bold tracking-[0.2em] uppercase mb-4 text-xs md:text-sm">03 // Le Marché</h2>
+                <h3 class="text-3xl md:text-6xl font-black text-white mb-10 md:mb-16">Un potentiel immense</h3>
+
+                <div class="flex flex-col md:flex-row justify-center gap-6 md:gap-16 w-full max-w-5xl">
+                    <div class="glass-card flex-1 p-8 md:p-12 rounded-[2rem] border-t-8 border-t-blue-500 relative overflow-hidden group">
+                        <div class="absolute -right-10 -top-10 w-32 h-32 md:w-40 md:h-40 bg-blue-500/20 blur-3xl rounded-full group-hover:bg-blue-500/40 transition-all duration-500"></div>
+                        <h4 class="text-5xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-blue-400 to-blue-600 mb-4 md:mb-6 font-heading">100K+</h4>
+                        <p class="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3">PME & PMI au Togo</p>
+                        <p class="text-slate-400 text-sm md:text-lg">En quête de digitalisation urgente.</p>
+                    </div>
+
+                    <div class="glass-card flex-1 p-8 md:p-12 rounded-[2rem] border-t-8 border-t-emerald-500 relative overflow-hidden group">
+                        <div class="absolute -left-10 -bottom-10 w-32 h-32 md:w-40 md:h-40 bg-emerald-500/20 blur-3xl rounded-full group-hover:bg-emerald-500/40 transition-all duration-500"></div>
+                        <h4 class="text-5xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-emerald-400 to-emerald-600 mb-4 md:mb-6 font-heading">10K+</h4>
+                        <p class="text-xl md:text-2xl font-bold text-white mb-2 md:mb-3">Étudiants & Talents</p>
+                        <p class="text-slate-400 text-sm md:text-lg">Prêts à monétiser leurs compétences.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5 : Technologie -->
+        <div class="slide">
+            <div class="absolute inset-0 bg-cover bg-center z-[-2] opacity-20" style="background-image: url('https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=1920&q=80');"></div>
+            <div class="bg-overlay"></div>
+
+            <div class="h-full flex flex-col justify-center items-center px-6 md:px-24 lg:px-32 text-center slide-content py-10">
+                <h2 class="text-purple-400 font-bold tracking-[0.2em] uppercase mb-4 text-xs md:text-sm">04 // Technologie & Sécurité</h2>
+                <h3 class="text-3xl md:text-6xl font-black text-white mb-10 md:mb-16">Architecture Serverless</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-5xl text-left">
+                    <div class="glass-card p-6 md:p-10 rounded-2xl md:rounded-3xl group">
+                        <div class="flex items-center gap-4 md:gap-6 mb-4 md:mb-6">
+                            <div class="bg-emerald-500/10 p-3 md:p-5 rounded-xl md:rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                                <i class="fa-solid fa-shield-check text-2xl md:text-4xl text-emerald-400"></i>
+                            </div>
+                            <h4 class="text-xl md:text-3xl font-bold text-white">Badge (KYC)</h4>
+                        </div>
+                        <p class="text-slate-300 text-sm md:text-lg leading-relaxed">Profils certifiés via validation stricte (NIF, RCCM). Écosystème <strong class="text-emerald-400">Zéro Arnaque</strong> garanti pour sécuriser les partenaires.</p>
+                    </div>
+
+                    <div class="glass-card p-6 md:p-10 rounded-2xl md:rounded-3xl group">
+                        <div class="flex items-center gap-4 md:gap-6 mb-4 md:mb-6">
+                            <div class="bg-blue-500/10 p-3 md:p-5 rounded-xl md:rounded-2xl shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+                                <i class="fa-brands fa-flutter text-2xl md:text-4xl text-blue-400"></i>
+                            </div>
+                            <h4 class="text-xl md:text-3xl font-bold text-white">Flutter & Firebase</h4>
+                        </div>
+                        <p class="text-slate-300 text-sm md:text-lg leading-relaxed">Application native. <strong class="text-blue-400">Firestore</strong> pour le temps réel, et <strong class="text-blue-400">Storage</strong> pour le streaming vidéo fluide.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6 : Équipe -->
+        <div class="slide">
+            <div class="absolute inset-0 bg-cover bg-center z-[-2] opacity-40 mix-blend-luminosity" style="background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1920&q=80');"></div>
+            <div class="bg-overlay"></div>
+
+            <div class="h-full flex flex-col justify-center items-center px-6 md:px-24 lg:px-32 text-center slide-content py-10 w-full">
+                <div class="inline-block px-4 md:px-6 py-2 rounded-full border border-blue-500/50 bg-blue-500/20 text-blue-300 text-xs md:text-sm font-bold tracking-[0.2em] mb-6 md:mb-8 backdrop-blur-md">
+                    L'ÉQUIPE JOVGROUP
+                </div>
+
+                <h3 class="text-3xl md:text-7xl font-black text-white mb-10 md:mb-16">Prêts à digitaliser<br>les PME Togolaises.</h3>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-6xl w-full mb-8 md:mb-12">
+                    <div class="glass-card p-4 md:p-6 rounded-2xl text-center hover:-translate-y-2 transition-transform">
+                        <div class="w-12 h-12 md:w-16 md:h-16 mx-auto bg-slate-800 rounded-full flex items-center justify-center mb-3 md:mb-4 border-2 border-blue-400/50">
+                            <i class="fa-solid fa-code text-lg md:text-2xl text-blue-400"></i>
+                        </div>
+                        <p class="font-bold text-white text-sm md:text-xl mb-1">Bruce C.</p>
+                        <p class="text-blue-400 text-xs md:text-sm font-medium">Lead Dev UI/UX</p>
+                    </div>
+                    <div class="glass-card p-4 md:p-6 rounded-2xl text-center hover:-translate-y-2 transition-transform">
+                        <div class="w-12 h-12 md:w-16 md:h-16 mx-auto bg-slate-800 rounded-full flex items-center justify-center mb-3 md:mb-4 border-2 border-blue-400/50">
+                            <i class="fa-solid fa-server text-lg md:text-2xl text-blue-400"></i>
+                        </div>
+                        <p class="font-bold text-white text-sm md:text-xl mb-1">Sèvi P.</p>
+                        <p class="text-blue-400 text-xs md:text-sm font-medium">Dev & Admin</p>
+                    </div>
+                    <div class="glass-card p-4 md:p-6 rounded-2xl text-center hover:-translate-y-2 transition-transform">
+                        <div class="w-12 h-12 md:w-16 md:h-16 mx-auto bg-slate-800 rounded-full flex items-center justify-center mb-3 md:mb-4 border-2 border-emerald-400/50">
+                            <i class="fa-solid fa-network-wired text-lg md:text-2xl text-emerald-400"></i>
+                        </div>
+                        <p class="font-bold text-white text-sm md:text-xl mb-1">Pauline A.</p>
+                        <p class="text-emerald-400 text-xs md:text-sm font-medium">Dev & Réseau</p>
+                    </div>
+                    <div class="glass-card p-4 md:p-6 rounded-2xl text-center hover:-translate-y-2 transition-transform">
+                        <div class="w-12 h-12 md:w-16 md:h-16 mx-auto bg-slate-800 rounded-full flex items-center justify-center mb-3 md:mb-4 border-2 border-purple-400/50">
+                            <i class="fa-solid fa-bullhorn text-lg md:text-2xl text-purple-400"></i>
+                        </div>
+                        <p class="font-bold text-white text-sm md:text-xl mb-1">Juste A.</p>
+                        <p class="text-purple-400 text-xs md:text-sm font-medium">Marketing</p>
+                    </div>
+                </div>
+
+                <a href="mailto:contact@jovgroup.tg" class="text-lg md:text-2xl text-emerald-400 font-bold hover:text-emerald-300 transition-colors tracking-wide">
+                    contact@jovgroup.tg
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('progress-bar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        function updateUI() {
+            slides.forEach((slide, index) => {
+                if(index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            const progress = ((currentSlide + 1) / slides.length) * 100;
+            progressBar.style.width = progress + '%';
+
+            // Gérer la désactivation visuelle des boutons
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            if (currentSlide < 0) currentSlide = 0;
+            updateUI();
+        }
+
+        // Contrôles Clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                if (currentSlide < slides.length - 1) changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) changeSlide(-1);
+            }
+        });
+
+        // Contrôles Swipe Mobile (amélioré pour éviter le scroll vertical accidentel)
+        let touchstartX = 0;
+        let touchendX = 0;
+        let touchstartY = 0;
+        let touchendY = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX;
+            touchstartY = e.changedTouches[0].screenY;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            touchendY = e.changedTouches[0].screenY;
+            
+            // Ne déclenche le swipe que si le mouvement horizontal est significatif et supérieur au mouvement vertical
+            if (Math.abs(touchendX - touchstartX) > 50 && Math.abs(touchendX - touchstartX) > Math.abs(touchendY - touchstartY)) {
+                if (touchendX < touchstartX && currentSlide < slides.length - 1) changeSlide(1);
+                if (touchendX > touchstartX && currentSlide > 0) changeSlide(-1);
+            }
+        });
+
+        // Init
+        updateUI();
+    </script>
+</body>
+</html>
